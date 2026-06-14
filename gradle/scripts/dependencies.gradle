@@ -1,0 +1,30 @@
+dependencies {
+    // Anvil Lib
+    runtimeOnly(libs.anvillib)
+    compileOnly(libs.bundles.anvillib)
+    interfaceInjectionData(libs.anvillib.recipe)
+    interfaceInjectionData(libs.anvillib.moveableEntityBlock)
+
+    // AnvilCraft
+    implementation(libs.anvilcraft) { transitive = false }
+    interfaceInjectionData(libs.anvilcraft) { transitive = false }
+
+    // AnvilCraft: GuideME
+//    implementation(libs.anvilcraftguideme) { transitive = false }
+
+    // Curios API
+//    implementation(libs.curios)
+
+    // JEI
+    compileOnlyApi(libs.jei.common.api) { transitive = false }
+    compileOnlyApi(libs.jei.forge.api) { transitive = false }
+    implementation(libs.jei.forge) { transitive = false }
+
+    // GuideME
+//    compileOnly("org.appliedenergistics:guideme:${libs.versions.guideme.get()}:api")
+//    runtimeOnly(libs.guideme)
+//    runtimeOnly(libs.ae2)
+
+    // Jade
+    implementation(libs.jade)
+}
