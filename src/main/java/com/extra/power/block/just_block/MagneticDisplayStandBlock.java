@@ -8,10 +8,15 @@ import dev.dubhe.anvilcraft.api.power.IPowerComponent;
 import dev.dubhe.anvilcraft.block.state.Vertical3PartHalf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -24,6 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -31,6 +37,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MagneticDisplayStandBlock extends BaseEntityBlock implements IHammerRemovable {
@@ -104,7 +111,7 @@ public class MagneticDisplayStandBlock extends BaseEntityBlock implements IHamme
 
         ItemStack handStack = player.getItemInHand(hand);
         ItemStack displayItem = displayStand.getItemstack();
-
+        if (displayStand.isLocked())return InteractionResult.PASS;
         try (Transaction transaction = Transaction.openRoot()) {
             if (handStack.isEmpty()) {
                 // 空手 - 取出物品
@@ -176,6 +183,21 @@ public class MagneticDisplayStandBlock extends BaseEntityBlock implements IHamme
             level.removeBlockEntity(pos);
         }
         super.affectNeighborsAfterRemoval(state, level,pos, movedByPiston);
+    }
+    @Override
+    public void stepOn(Level level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Entity entity) {
+        if (entity instanceof ItemEntity itemEntity && !level.isClientSide()) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof MagneticDisplayStandBlockEntity displayStand) {
+                ItemStack itemStack = itemEntity.getItem();
+                if (itemStack.is(Items.HONEYCOMB) && !displayStand.isLocked()) {
+                    displayStand.LockIt();
+                    level.levelEvent(entity, 3003, pos, 0);
+                    itemEntity.setItem(new ItemStack(Items.AIR));
+                }
+            }
+            super.stepOn(level, pos, state, entity);
+        }
     }
     @Override
     public boolean isSignalSource(BlockState state) {

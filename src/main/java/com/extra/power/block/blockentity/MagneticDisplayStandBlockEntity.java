@@ -153,7 +153,12 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
         }
         entity.syncAnimationState();
     }
-
+    public Boolean isLocked() {
+        return this.locked ;
+    }
+    public void LockIt() {
+        this.locked  = true;
+    }
     // ---------- 网络同步（服务端 → 客户端） ----------
     private void syncAnimationState() {
         if (level == null || level.isClientSide()) return;
@@ -313,6 +318,7 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
 
     @Override
     public void onScrollAdjust(String parameterId, float delta, Level level, BlockPos pos) {
+        if (this.locked) return;
         if ("height_offset".equals(parameterId)) {
             float newOffset = userHeightOffset + delta * 0.25f;
             newOffset = (float) Math.clamp(newOffset, MIN_HEIGHT_OFFSET, MAX_HEIGHT_OFFSET);
