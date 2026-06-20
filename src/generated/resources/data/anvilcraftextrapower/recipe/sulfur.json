@@ -3,9 +3,7 @@
   "category": "misc",
   "group": "anvilcraftextrapower:sulfur",
   "ingredients": [
-    {
-      "item": "anvilcraftextrapower:sulfur_block"
-    }
+    "anvilcraftextrapower:sulfur_block"
   ],
   "result": {
     "count": 9,

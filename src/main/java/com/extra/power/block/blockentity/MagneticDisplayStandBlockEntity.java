@@ -38,14 +38,16 @@ import java.util.List;
 public class MagneticDisplayStandBlockEntity extends BlockEntity
         implements IPowerConsumer, IHasDisplayItem, IScrollAdjustable, IItemResourceHandlerHolder {
 
-    private float userHeightOffset = 0.0f;
-    private static final float MIN_HEIGHT_OFFSET = -0.5f;
+    private float userHeightOffset = 0.5f;
+    private static final float MIN_HEIGHT_OFFSET = 0.0f;
     private static final float MAX_HEIGHT_OFFSET = 6.0f;
     private static final int POWER = 8;
     private static final int SYNC_INTERVAL = 40;
     private int action_t = 0;
     private int syncTimer = 0;
     private boolean loading = false;
+    private boolean locked = false;
+    private int RP = 0;
     @Getter
     private List<Double> action_state = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     @Getter
@@ -111,9 +113,9 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
         }
         List<Float> target_state = Arrays.asList(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
         if (entity.loading && getDisplayItemStack().getItem() instanceof BlockItem) {
-            target_state = Arrays.asList(0.0f, 0.5f + entity.userHeightOffset, 0.0f, 0.0f, (float) level.getGameTime() % 360, 0.0f);
+            target_state = Arrays.asList(0.0f, entity.userHeightOffset*(15-entity.RP)/15, 0.0f, 0.0f, (float) level.getGameTime() % 360, 0.0f);
         } else if (entity.loading) {
-            target_state = Arrays.asList(0.0f, 0.5f + entity.userHeightOffset, 0.125f, -90.0f, (float) level.getGameTime() % 360, 0.0f);
+            target_state = Arrays.asList(0.0f, entity.userHeightOffset*(15-entity.RP)/15, 0.125f, -90.0f, (float) level.getGameTime() % 360, 0.0f);
         }
         for (int i = 0; i < entity.action_state.size(); i++) {
             double current = entity.action_state.get(i);
@@ -133,9 +135,9 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
             }
         }
 
-        // 修复动画同步：loading 始终等于未过载状态 (假设 OVERLOAD 为 true 时过载，需要停止动画)
         if (!level.isClientSide() && entity.action_t % 3 == 0) {
-            entity.loading = !state.getValue(OVERLOAD);
+
+            entity.loading = !state.getValue(OVERLOAD) && !(entity.RP==15);
             entity.action_t = 0;
         }
 
@@ -143,6 +145,7 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
             this.flushState(level, pos);
             entity.action_t++;
             entity.syncTimer++;
+            entity.RP = level.getBestNeighborSignal(pos);
             if (entity.syncTimer >= SYNC_INTERVAL) {
                 entity.syncTimer = 0;
                 entity.syncDisplayItemPeriodically();
@@ -235,6 +238,7 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         output.putBoolean("load", loading);
+        output.putBoolean("locked", locked);
         itemHandler.serialize(output.child("Inventory"));
         output.putFloat("UserHeightOffset", userHeightOffset);
         var animationComp = output.child("AnimationState");
@@ -246,7 +250,8 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        loading = input.getBooleanOr("load", false);   // 修复：实际赋值
+        loading = input.getBooleanOr("load", false);
+        locked = input.getBooleanOr("locked", false);
         itemHandler.deserialize(input.childOrEmpty("Inventory"));
         userHeightOffset = input.getFloatOr("UserHeightOffset", 0.0f);
         userHeightOffset = (float) Math.clamp(userHeightOffset, MIN_HEIGHT_OFFSET, MAX_HEIGHT_OFFSET);

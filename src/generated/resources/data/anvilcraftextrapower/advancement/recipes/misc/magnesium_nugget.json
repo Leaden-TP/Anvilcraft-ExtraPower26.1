@@ -1,13 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "anvilcraftextrapower:magnesium_nugget"
-      },
-      "trigger": "minecraft:recipe_unlocked"
-    },
-    "hasitem": {
+    "has_magnesium_ingot": {
       "conditions": {
         "items": [
           {
@@ -17,22 +11,17 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "hasitemblock": {
+    "has_the_recipe": {
       "conditions": {
-        "items": [
-          {
-            "items": "anvilcraftextrapower:magnesium_block"
-          }
-        ]
+        "recipe": "anvilcraftextrapower:magnesium_nugget"
       },
-      "trigger": "minecraft:inventory_changed"
+      "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "hasitem",
-      "hasitemblock"
+      "has_magnesium_ingot"
     ]
   ],
   "rewards": {

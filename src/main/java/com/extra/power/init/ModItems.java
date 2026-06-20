@@ -5,6 +5,7 @@ import com.extra.power.item.capacitor.EmptyLeadacidBatteryItem;
 import com.extra.power.item.capacitor.LeadacidBatteryItem;
 import com.extra.power.item.capacitor.MultiphaseCapacitorItem;
 import dev.anvilcraft.lib.v2.registrum.util.entry.ItemEntry;
+import dev.dubhe.anvilcraft.util.registrater.DataGenUtil;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 
@@ -58,23 +59,27 @@ public class ModItems {
     public static final ItemEntry<LeadacidBatteryItem> LEAD_ACID_BATTERY = REGISTRATE.item("lead_acid_battery", LeadacidBatteryItem::new)
             .lang("Lead-acid Battery")
             .tag(ModItemTags.CAPACITOR)
+            .model(DataGenUtil::onlyInfo)
             .register();
 
     public static final ItemEntry<EmptyLeadacidBatteryItem> LEAD_ACID_BATTERY_EMPTY = REGISTRATE.item("lead_acid_battery_empty", EmptyLeadacidBatteryItem::new)
             .lang("Lead-acid Battery Empty")
             .tag(ModItemTags.CAPACITOR)
+            .model(DataGenUtil::onlyInfo)
             .recipe(RegistrumItemRecipeLoader::leadAcidBatteryEmpty)
             .register();
 
     public static final ItemEntry<MultiphaseCapacitorItem> MULTIPHASE_CAPACITOR_EMPTY = REGISTRATE.item("multiphase_capacitor_empty", MultiphaseCapacitorItem::new)
             .lang("Multiphase Capacitor Empty")
             .tag(ModItemTags.CAPACITOR)
+            .model(DataGenUtil::onlyInfo)
             .recipe(RegistrumItemRecipeLoader::multiphaseCapacitorEmpty)
             .register();
 
     public static final ItemEntry<MultiphaseCapacitorItem> MULTIPHASE_CAPACITOR = REGISTRATE.item("multiphase_capacitor", MultiphaseCapacitorItem::new)
             .lang("Multiphase Capacitor")
             .tag(ModItemTags.CAPACITOR)
+            .model(DataGenUtil::onlyInfo)
             .recipe(RegistrumItemRecipeLoader::multiphaseCapacitor)
             .register();
 }

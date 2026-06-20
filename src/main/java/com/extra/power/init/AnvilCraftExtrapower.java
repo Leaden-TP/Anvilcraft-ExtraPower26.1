@@ -3,6 +3,7 @@ package com.extra.power.init;
 
 import com.extra.power.block.ModBlock;
 import com.extra.power.config.ModServerConfig;
+import com.extra.power.data.ModDatagen;
 import dev.anvilcraft.lib.v2.config.ConfigManager;
 import dev.anvilcraft.lib.v2.network.register.NetworkRegistrar;
 import dev.anvilcraft.lib.v2.registrum.Registrum;
@@ -50,6 +51,7 @@ public class AnvilCraftExtrapower {
         modEventBus.addListener(this::registerPayload);
         ModSounds.SOUNDS.register(modEventBus);
         ModDamageTypes.DAMAGE_TYPES.register(modEventBus);
+        ModDatagen.init();
     }
 
 

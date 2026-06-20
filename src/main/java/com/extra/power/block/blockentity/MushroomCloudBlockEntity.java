@@ -3,16 +3,13 @@ package com.extra.power.block.blockentity;
 import com.extra.power.block.ModBlock;
 import com.extra.power.block.ModBlockEntity;
 import com.extra.power.config.ModServerConfig;
-import com.extra.power.function.Explosion;
 import com.extra.power.init.ModDamageTypes;
 import com.extra.power.init.ModSounds;
 import com.extra.power.network.FlashPayload;
 import com.extra.power.network.ShakePayload;
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -35,6 +32,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -42,10 +40,13 @@ public class MushroomCloudBlockEntity extends BlockEntity {
     private int ticks = 0;
     private int D_tick=0;//destroy tick 爆炸的第一阶段的计时刻
     private int S_r=10;//smollest radius 爆炸最小半径
+    @Getter
     private float C_size = 0;//Cloud size 蘑菇云大小
+    @Getter
     private float rotation = 0; // 核爆圈旋转角度
     private int last_y= ModServerConfig.nuclearExplosion.Explosionlevel*3;// 3阶段冲击波清理层数
     private boolean level_2=false; //爆炸的第二阶段
+    @Getter
     private float epicenterScale = 0.5f; // 当前缩放值
     private int isExpanding = 0;  // 膨胀阶段
     private static final float SCALE_ACCELERATION = 0.09f; // 缩放加速度
@@ -63,30 +64,20 @@ public class MushroomCloudBlockEntity extends BlockEntity {
     ) {
         return new MushroomCloudBlockEntity(type, pos, blockState);
     }
-    protected void loadAdditional(ValueInput input) {
+    protected void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
-        input.getIntOr("y" , 0);
-        input.getIntOr("D_tick" , 0);
-        input.getBooleanOr("level_2" , false);
+        last_y=input.getIntOr("y" , 0);
+        D_tick=input.getIntOr("D_tick" , 0);
+        level_2=input.getBooleanOr("level_2" , false);
 
     }
 
-    public void saveAdditional(ValueOutput output) {
+    public void saveAdditional(@NonNull ValueOutput output) {
         super.saveAdditional(output);
         output.putInt("y", this.last_y);
         output.putInt("D_tick", this.D_tick);
         output.putBoolean("level_2", this.level_2);
 
-    }
-    public float getEpicenterScale() {
-        return epicenterScale;
-    }
-
-    public float getC_size() {
-        return C_size;
-    }
-    public float getRotation() {
-        return rotation;
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, MushroomCloudBlockEntity entity) {

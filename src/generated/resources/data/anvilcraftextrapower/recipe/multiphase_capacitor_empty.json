@@ -3,12 +3,8 @@
   "category": "misc",
   "group": "anvilcraftextrapower:multiphase_capacitor_empty",
   "key": {
-    "M": {
-      "item": "anvilcraft:multiphase_matter"
-    },
-    "P": {
-      "tag": "c:plates/lead"
-    }
+    "M": "anvilcraft:multiphase_matter",
+    "P": "#c:plates/lead"
   },
   "pattern": [
     "P",
@@ -16,7 +12,6 @@
     "P"
   ],
   "result": {
-    "count": 1,
     "id": "anvilcraftextrapower:multiphase_capacitor_empty"
   }
 }

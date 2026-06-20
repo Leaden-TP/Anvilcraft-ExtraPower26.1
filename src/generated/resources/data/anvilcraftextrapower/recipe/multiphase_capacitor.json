@@ -3,15 +3,10 @@
   "category": "misc",
   "group": "anvilcraftextrapower:multiphase_capacitor",
   "ingredients": [
-    {
-      "item": "anvilcraftextrapower:multiphase_capacitor_empty"
-    },
-    {
-      "item": "anvilcraft:multiphase_matter_block"
-    }
+    "anvilcraftextrapower:multiphase_capacitor_empty",
+    "anvilcraft:multiphase_matter_block"
   ],
   "result": {
-    "count": 1,
     "id": "anvilcraftextrapower:multiphase_capacitor"
   }
 }

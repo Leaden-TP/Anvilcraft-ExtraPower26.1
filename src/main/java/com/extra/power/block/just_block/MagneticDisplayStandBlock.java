@@ -5,6 +5,7 @@ import com.extra.power.block.blockentity.MagneticDisplayStandBlockEntity;
 import com.mojang.serialization.MapCodec;
 import dev.dubhe.anvilcraft.api.hammer.IHammerRemovable;
 import dev.dubhe.anvilcraft.api.power.IPowerComponent;
+import dev.dubhe.anvilcraft.block.state.Vertical3PartHalf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -23,6 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -33,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class MagneticDisplayStandBlock extends BaseEntityBlock implements IHammerRemovable {
     public static final BooleanProperty OVERLOAD = IPowerComponent.OVERLOAD;
+    public static  BooleanProperty RP = BooleanProperty.create("rp");
     private static final VoxelShape BASE = Shapes.or(
             Block.box(0, 0, 0, 16.0, 3.0, 16.0),
             Block.box(0, 13, 0, 16, 15, 16),
@@ -41,13 +44,13 @@ public class MagneticDisplayStandBlock extends BaseEntityBlock implements IHamme
 
     public MagneticDisplayStandBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(OVERLOAD, true));
+        this.registerDefaultState(this.stateDefinition.any().setValue(OVERLOAD, true).setValue(RP, false));
     }
 
     @Override
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(OVERLOAD, true);
+        return this.defaultBlockState().setValue(OVERLOAD, true).setValue(RP, false);
     }
 
     @Override
@@ -72,7 +75,7 @@ public class MagneticDisplayStandBlock extends BaseEntityBlock implements IHamme
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(OVERLOAD);
+        builder.add(OVERLOAD).add(RP);
     }
 
     @Override
@@ -150,6 +153,18 @@ public class MagneticDisplayStandBlock extends BaseEntityBlock implements IHamme
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return BASE;
     }
+    @Override
+    public void neighborChanged(        BlockState state,
+                                        Level level,
+                                        BlockPos pos,
+                                        Block block,
+                                        @org.jspecify.annotations.Nullable Orientation orientation,
+                                        boolean movedByPiston
+    ) {
+        if (level.isClientSide()) return;
+        Boolean Rp = level.hasNeighborSignal(pos);
+        if (state.getValue(RP) != Rp)level.setBlock(pos,state.setValue(RP, Rp), 3);
+    }
 
     @Override
     protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
@@ -161,5 +176,9 @@ public class MagneticDisplayStandBlock extends BaseEntityBlock implements IHamme
             level.removeBlockEntity(pos);
         }
         super.affectNeighborsAfterRemoval(state, level,pos, movedByPiston);
+    }
+    @Override
+    public boolean isSignalSource(BlockState state) {
+        return true;
     }
 }

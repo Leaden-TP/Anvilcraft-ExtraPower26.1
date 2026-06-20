@@ -1,13 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "anvilcraftextrapower:multiphase_capacitor"
-      },
-      "trigger": "minecraft:recipe_unlocked"
-    },
-    "hasitemm": {
+    "has_empty_capacitor": {
       "conditions": {
         "items": [
           {
@@ -16,12 +10,18 @@
         ]
       },
       "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "anvilcraftextrapower:multiphase_capacitor"
+      },
+      "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "hasitemm"
+      "has_empty_capacitor"
     ]
   ],
   "rewards": {

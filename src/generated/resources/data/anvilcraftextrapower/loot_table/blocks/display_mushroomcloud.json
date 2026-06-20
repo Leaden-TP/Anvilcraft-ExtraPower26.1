@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "anvilcraftextrapower:semi_finished_crate"
+          "name": "anvilcraftextrapower:display_mushroomcloud"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "anvilcraftextrapower:blocks/semi_finished_crate"
+  "random_sequence": "anvilcraftextrapower:blocks/display_mushroomcloud"
 }

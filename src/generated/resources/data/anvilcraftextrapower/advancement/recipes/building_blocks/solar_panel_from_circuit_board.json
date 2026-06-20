@@ -1,31 +1,31 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_ember_metal_block": {
+    "has_circuit_board": {
       "conditions": {
         "items": [
           {
-            "items": "anvilcraft:ember_metal_block"
+            "items": "anvilcraft:circuit_board"
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_ember_nugget": {
+    "has_daylight_detector": {
       "conditions": {
         "items": [
           {
-            "items": "anvilcraft:ember_metal_nugget"
+            "items": "minecraft:daylight_detector"
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_heat_collector": {
+    "has_iron_plate": {
       "conditions": {
         "items": [
           {
-            "items": "anvilcraft:heat_collector"
+            "items": "#c:plates/iron"
           }
         ]
       },
@@ -33,33 +33,22 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "anvilcraftextrapower:nuclear_collector"
+        "recipe": "anvilcraftextrapower:solar_panel_from_circuit_board"
       },
       "trigger": "minecraft:recipe_unlocked"
-    },
-    "has_uranium_block": {
-      "conditions": {
-        "items": [
-          {
-            "items": "anvilcraft:uranium_block"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_uranium_block",
-      "has_ember_metal_block",
-      "has_ember_nugget",
-      "has_heat_collector"
+      "has_circuit_board",
+      "has_daylight_detector",
+      "has_iron_plate"
     ]
   ],
   "rewards": {
     "recipes": [
-      "anvilcraftextrapower:nuclear_collector"
+      "anvilcraftextrapower:solar_panel_from_circuit_board"
     ]
   }
 }

@@ -14,11 +14,6 @@ public class ModBlockEntity {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITYS =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, AnvilCraftExtrapower.MODID);
 
-    public static final BlockEntityEntry<CrateBlockEntity> CRATE =
-            REGISTRATE.blockEntity("crate", CrateBlockEntity::createBlockEntity)
-                    .validBlock(CRATE_BLOCK)
-                    .register();
-
     public static final BlockEntityEntry<BurningCoalBlockEntity> BURNING_COAL =
             REGISTRATE.blockEntity("burning_coal_block", BurningCoalBlockEntity::createBlockEntity)
                     .validBlock(ModBlock.BURNING_COAL_BLOCK)

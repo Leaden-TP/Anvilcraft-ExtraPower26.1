@@ -14,7 +14,6 @@ public class CapabilitiesEventListener {
     @SubscribeEvent
     public static void registerCapabilities(final RegisterCapabilitiesEvent event) {
         List.of(
-                ModBlockEntity.CRATE.get(),
                 ModBlockEntity.MAGNETIC_DISPLAY_STAND.get()
         ).forEach(type -> event.registerBlockEntity(
                         Capabilities.Item.BLOCK,

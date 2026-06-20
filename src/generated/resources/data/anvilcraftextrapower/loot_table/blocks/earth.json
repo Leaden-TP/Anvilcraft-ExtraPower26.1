@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "anvilcraftextrapower:crate"
+          "name": "anvilcraftextrapower:earth"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "anvilcraftextrapower:blocks/crate"
+  "random_sequence": "anvilcraftextrapower:blocks/earth"
 }

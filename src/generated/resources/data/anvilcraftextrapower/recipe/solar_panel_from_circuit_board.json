@@ -1,25 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
-  "group": "anvilcraftextrapower:solar_panel_from_circuit_board",
   "key": {
-    "A": {
-      "item": "minecraft:daylight_detector"
-    },
-    "S": {
-      "item": "anvilcraft:circuit_board"
-    },
-    "C": {
-      "tag": "c:plates/iron"
-    }
+    "A": "minecraft:daylight_detector",
+    "C": "#c:plates/iron",
+    "V": "anvilcraft:circuit_board"
   },
   "pattern": [
     "ACA",
-    " S ",
+    " V ",
     " C "
   ],
   "result": {
-    "count": 1,
     "id": "anvilcraftextrapower:solar_panel"
   }
 }

@@ -3,9 +3,7 @@
   "category": "misc",
   "group": "anvilcraftextrapower:magnesium_nugget",
   "ingredients": [
-    {
-      "item": "anvilcraftextrapower:magnesium_ingot"
-    }
+    "anvilcraftextrapower:magnesium_ingot"
   ],
   "result": {
     "count": 9,

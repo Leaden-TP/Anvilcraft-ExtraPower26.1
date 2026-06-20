@@ -1,13 +1,17 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_the_recipe": {
+    "has_royal_steel": {
       "conditions": {
-        "recipe": "anvilcraftextrapower:lead_acid_battery_empty"
+        "items": [
+          {
+            "items": "anvilcraft:royal_steel_ingot"
+          }
+        ]
       },
-      "trigger": "minecraft:recipe_unlocked"
+      "trigger": "minecraft:inventory_changed"
     },
-    "hasiteml": {
+    "has_sulfuric_acid": {
       "conditions": {
         "items": [
           {
@@ -17,22 +21,18 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "hasitemr": {
+    "has_the_recipe": {
       "conditions": {
-        "items": [
-          {
-            "items": "anvilcraft:royal_steel_ingot"
-          }
-        ]
+        "recipe": "anvilcraftextrapower:lead_acid_battery_empty"
       },
-      "trigger": "minecraft:inventory_changed"
+      "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "hasiteml",
-      "hasitemr"
+      "has_sulfuric_acid",
+      "has_royal_steel"
     ]
   ],
   "rewards": {

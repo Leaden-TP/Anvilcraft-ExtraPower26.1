@@ -3,6 +3,7 @@ package com.extra.power.block;
 import com.extra.power.block.just_block.*;
 import com.extra.power.data.recipe.RegistrumBlockRecipeLoader;
 import com.extra.power.init.ModCreativeModeTab;
+import com.extra.power.item.capacitor.PotatoBatteryItem;
 import dev.anvilcraft.lib.v2.registrum.util.entry.BlockEntry;
 import dev.dubhe.anvilcraft.block.multipart.SimpleMultiPartBlock;
 import dev.dubhe.anvilcraft.init.block.ModBlockTags;
@@ -41,6 +42,30 @@ public class ModBlock {
             .blockstate(DataGenUtil::noExtraModelOrState)
             .register();
 
+    public static final BlockEntry<Block> EARTH = REGISTRATE.block("earth", Block::new)
+            .lang("Earth")
+            .initialProperties(() -> Blocks.STONE)
+            .properties(p -> p
+                    .strength(-1f, -1f)
+                    .sound(SoundType.GLASS)
+                    .lightLevel(state -> 15))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
+    public static final BlockEntry<Block> DISPLAY_MUSHROOMCLOUD = REGISTRATE.block("display_mushroomcloud", Block::new)
+            .lang("Display Mushroomcloud")
+            .initialProperties(() -> Blocks.STONE)
+            .properties(p -> p
+                    .strength(-1f, -1f)
+                    .sound(SoundType.GLASS)
+                    .lightLevel(state -> 15)
+                    .noOcclusion())
+            .item()
+            .build()
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .register();
+
     public static final BlockEntry<? extends Block> SOLAR_PANEL = REGISTRATE.block("solar_panel", SolarPanelBlock::new)
             .lang("Solar Panel")
             .initialProperties(() -> Blocks.IRON_BLOCK)
@@ -57,7 +82,6 @@ public class ModBlock {
             .lang("Burning Block of Coal")
             .initialProperties(() -> Blocks.COAL_BLOCK)
             .properties(p -> p.strength(2.0f, 5f).lightLevel(state -> 10))
-            .blockstate(DataGenUtil::noExtraModelOrState)
             .item()
             .build()
             .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, ModBlockTags.REDHOT_BLOCKS)
@@ -77,7 +101,6 @@ public class ModBlock {
             .lang("Block of Sulfur")
             .initialProperties(() -> Blocks.COAL_BLOCK)
             .properties(p -> p.strength(3.0f, 5f))
-            .blockstate(DataGenUtil::noExtraModelOrState)
             .item()
             .tag(Tags.Items.STORAGE_BLOCKS, com.extra.power.init.ModItemTags.STORAGE_BLOCKS_SULFUR)
             .build()
@@ -108,7 +131,6 @@ public class ModBlock {
             .lang("Block of Magnesium Oxide")
             .initialProperties(() -> Blocks.STONE)
             .properties(p -> p.strength(10.0f, 1f))
-            .blockstate(DataGenUtil::noExtraModelOrState)
             .item()
             .build()
             .tag(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -127,7 +149,6 @@ public class ModBlock {
             .lang("Block of Magnesium")
             .initialProperties(() -> Blocks.IRON_BLOCK)
             .properties(p -> p.strength(3.0f, 5f))
-            .blockstate(DataGenUtil::noExtraModelOrState)
             .item()
             .tag(Tags.Items.STORAGE_BLOCKS, com.extra.power.init.ModItemTags.STORAGE_BLOCKS_MAGNESIUM)
             .build()
@@ -139,7 +160,6 @@ public class ModBlock {
             .lang("Burning Block of Magnesium")
             .initialProperties(() -> Blocks.IRON_BLOCK)
             .properties(p -> p.strength(2.0f, 5f).lightLevel(state -> 15))
-            .blockstate(DataGenUtil::noExtraModelOrState)
             .loot((lt, block) -> lt.add(block,
                     LootTable.lootTable()
                             .withPool(LootPool.lootPool()
@@ -154,12 +174,13 @@ public class ModBlock {
             .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.NEEDS_STONE_TOOL, ModBlockTags.INCANDESCENT_BLOCKS)
             .register();
 
-    public static final BlockEntry<? extends Block> POTATO_BATTERY = REGISTRATE.block("potato_battery", PotatoBattery::new)
+    public static final BlockEntry<? extends Block> POTATO_BATTERY = REGISTRATE
+            .block("potato_battery", PotatoBattery::new)
             .lang("Potato Battery")
             .initialProperties(() -> Blocks.SLIME_BLOCK)
             .properties(p -> p.strength(0.5f, 2f))
             .blockstate(DataGenUtil::noExtraModelOrState)
-            .item()
+            .item(PotatoBatteryItem::new)
             .tag(com.extra.power.init.ModItemTags.CAPACITOR)
             .build()
             .recipe(RegistrumBlockRecipeLoader::potatoBattery)
@@ -168,30 +189,10 @@ public class ModBlock {
     public static final BlockEntry<? extends Block> FLASHING_POTATO_BATTERY = REGISTRATE.block("flashing_potato_battery", PotatoBattery::new)
             .lang("Flashing Potato Battery")
             .initialProperties(() -> Blocks.SLIME_BLOCK)
+            .blockstate(DataGenUtil::noExtraModelOrState)
             .properties(p -> p.strength(0.5f, 2f))
-            .blockstate(DataGenUtil::noExtraModelOrState)
-            .item()
+            .item(PotatoBatteryItem::new)
             .tag(com.extra.power.init.ModItemTags.CAPACITOR)
-            .build()
-            .register();
-
-    public static final BlockEntry<? extends Block> CRATE_BLOCK = REGISTRATE.block("crate", CrateBlock::new)
-            .lang("Crate")
-            .initialProperties(() -> Blocks.OAK_WOOD)
-            .properties(p -> p.strength(2f, 5f))
-            .tag(BlockTags.MINEABLE_WITH_AXE)
-            .blockstate(DataGenUtil::noExtraModelOrState)
-            .item()
-            .build()
-            .register();
-
-    public static final BlockEntry<? extends Block> SEMI_FINISHED_CRATE = REGISTRATE.block("semi_finished_crate", Block::new)
-            .lang("Semi-Finished Crate")
-            .initialProperties(() -> Blocks.OAK_WOOD)
-            .properties(p -> p.strength(2f, 5f))
-            .tag(BlockTags.MINEABLE_WITH_AXE)
-            .blockstate(DataGenUtil::noExtraModelOrState)
-            .item()
             .build()
             .register();
 
