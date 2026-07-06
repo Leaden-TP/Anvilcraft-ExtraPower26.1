@@ -7,7 +7,6 @@ import dev.anvilcraft.lib.v2.registrum.util.entry.BlockEntityEntry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import static com.extra.power.block.ModBlock.*;
 import static com.extra.power.init.AnvilCraftExtrapower.REGISTRATE;
 
 public class ModBlockEntity {
@@ -57,6 +56,11 @@ public class ModBlockEntity {
             REGISTRATE.blockEntity("magnetic_display_stand", MagneticDisplayStandBlockEntity::createBlockEntity)
                     .validBlock(ModBlock.MAGNETIC_DISPLAY_STAND)
                     .renderer(() -> MagneticDisplayStandRenderer::new)
+                    .register();
+
+    public static final BlockEntityEntry<ElectromagnetBlockEntity> ELECTROMAGNET =
+            REGISTRATE.blockEntity("electromagnet", ElectromagnetBlockEntity::createBlockEntity)
+                    .validBlock(ModBlock.ELECTROMAGNET)
                     .register();
 
     public static final BlockEntityEntry<PedometerBlockEntity> PEDOMETER =

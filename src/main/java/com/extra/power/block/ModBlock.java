@@ -10,6 +10,7 @@ import dev.dubhe.anvilcraft.init.block.ModBlockTags;
 import dev.dubhe.anvilcraft.init.block.ModBlocks;
 import dev.dubhe.anvilcraft.util.registrater.DataGenUtil;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
@@ -48,7 +49,8 @@ public class ModBlock {
             .properties(p -> p
                     .strength(-1f, -1f)
                     .sound(SoundType.GLASS)
-                    .lightLevel(state -> 15))
+                    .lightLevel(state -> 15)
+                    .noLootTable())
             .blockstate(DataGenUtil::noExtraModelOrState)
             .item()
             .build()
@@ -60,7 +62,8 @@ public class ModBlock {
                     .strength(-1f, -1f)
                     .sound(SoundType.GLASS)
                     .lightLevel(state -> 15)
-                    .noOcclusion())
+                    .noOcclusion()
+                    .noLootTable())
             .item()
             .build()
             .blockstate(DataGenUtil::noExtraModelOrState)
@@ -282,6 +285,29 @@ public class ModBlock {
             .blockstate(DataGenUtil::noExtraModelOrState)
             .item()
             .build()
+            .register();
+
+    public static final BlockEntry<? extends Block> ELECTROMAGNET = REGISTRATE.block("electromagnet",
+                    ElectromagnetBlock::new)
+            .lang("Electromagnet")
+            .initialProperties(() -> Blocks.NETHERITE_BLOCK)
+            .properties(p -> p.strength(2f, 3f).noOcclusion())
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .tag(ModBlockTags.MAGNET)
+            .register();
+
+    public static final BlockEntry<? extends Block> LLAMA_ANVIL = REGISTRATE.block("llama_anvil",
+                    LlamaAnvilBlock::new)
+            .lang("Llama Anvil")
+            .initialProperties(() -> Blocks.CAKE)
+            .properties(p -> p.noOcclusion().isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .tag(ItemTags.ANVIL)
+            .build()
+            .tag(BlockTags.ANVIL, BlockTags.MINEABLE_WITH_AXE, ModBlockTags.NON_MAGNETIC, ModBlockTags.CANT_BROKEN_ANVIL)
             .register();
     public static void register() {
     }

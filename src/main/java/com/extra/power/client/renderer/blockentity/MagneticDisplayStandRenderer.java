@@ -54,7 +54,6 @@ public class MagneticDisplayStandRenderer implements BlockEntityRenderer<Magneti
         if (actionState != null && actionState.size() >= 6) {
             state.setActionState(actionState);
         }
-        state.setPartialTicks(partialTicks);
     }
 
     @Override
@@ -87,7 +86,7 @@ public class MagneticDisplayStandRenderer implements BlockEntityRenderer<Magneti
             double z = 0.5;
             pose.translate(x + xAdd, y + yAdd, z + zAdd);
             pose.scale(2.0f, 2.0f, 2.0f);
-            pose.mulPose(Axis.YP.rotationDegrees(rotY + state.getPartialTicks()));
+            pose.mulPose(Axis.YP.rotationDegrees(rotY));
         } else {
             AABB aabb = cluster.item.getModelBoundingBox();
             double modelDepth = aabb.getZsize();
@@ -95,8 +94,8 @@ public class MagneticDisplayStandRenderer implements BlockEntityRenderer<Magneti
             double y = 1.0 + modelDepth / 4;
             double z = 0.375;
             pose.translate(x + xAdd, y + yAdd, z + zAdd);
-            pose.mulPose(Axis.XP.rotationDegrees(90.0f + rotX + state.getPartialTicks()));
-            pose.mulPose(Axis.YP.rotationDegrees(rotY + state.getPartialTicks()));
+            pose.mulPose(Axis.XP.rotationDegrees(90.0f));
+            pose.mulPose(Axis.YP.rotationDegrees(rotY));
         }
         cluster.item.submit(pose, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
         pose.popPose();

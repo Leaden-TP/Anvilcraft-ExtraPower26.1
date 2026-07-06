@@ -38,25 +38,28 @@ import java.util.List;
 
 public class MushroomCloudBlockEntity extends BlockEntity {
     private int ticks = 0;
-    private int D_tick=0;//destroy tick 爆炸的第一阶段的计时刻
-    private int S_r=10;//smollest radius 爆炸最小半径
+    private int D_tick = 0; // destroy tick 爆炸的第一阶段的计时刻
+    private int S_r = 10; // smollest radius 爆炸最小半径
     @Getter
-    private float C_size = 0;//Cloud size 蘑菇云大小
+    private float C_size = 0; // Cloud size 蘑菇云大小
     @Getter
     private float rotation = 0; // 核爆圈旋转角度
-    private int last_y= ModServerConfig.nuclearExplosion.Explosionlevel*3;// 3阶段冲击波清理层数
-    private boolean level_2=false; //爆炸的第二阶段
+    private int last_y = ModServerConfig.nuclearExplosion.Explosionlevel * 3; // 3阶段冲击波清理层数
+    private boolean level_2 = false; // 爆炸的第二阶段
     @Getter
     private float epicenterScale = 0.5f; // 当前缩放值
-    private int isExpanding = 0;  // 膨胀阶段
+    private int isExpanding = 0; // 膨胀阶段
     private static final float SCALE_ACCELERATION = 0.09f; // 缩放加速度
-    private  float SCALE_SPEED = 0.05f; // 缩放速度
+    private float SCALE_SPEED = 0.05f; // 缩放速度
+
     public MushroomCloudBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
     }
+
     public MushroomCloudBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntity.MUSHROOM_CLOUD.get(), pos, state);
     }
+
     public static MushroomCloudBlockEntity createBlockEntity(
             BlockEntityType<?> type,
             BlockPos pos,
@@ -64,32 +67,33 @@ public class MushroomCloudBlockEntity extends BlockEntity {
     ) {
         return new MushroomCloudBlockEntity(type, pos, blockState);
     }
+
+    @Override
     protected void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
-        last_y=input.getIntOr("y" , 0);
-        D_tick=input.getIntOr("D_tick" , 0);
-        level_2=input.getBooleanOr("level_2" , false);
-
+        last_y = input.getIntOr("y", 0);
+        D_tick = input.getIntOr("D_tick", 0);
+        level_2 = input.getBooleanOr("level_2", false);
     }
 
+    @Override
     public void saveAdditional(@NonNull ValueOutput output) {
         super.saveAdditional(output);
         output.putInt("y", this.last_y);
         output.putInt("D_tick", this.D_tick);
         output.putBoolean("level_2", this.level_2);
-
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, MushroomCloudBlockEntity entity) {
         entity.SCALE_SPEED += SCALE_ACCELERATION;
-        //光球膨胀
+        // 光球膨胀
         if (entity.isExpanding == 0) {
             entity.epicenterScale += entity.SCALE_SPEED;
             if (entity.epicenterScale >= 5) {
                 entity.isExpanding += 1;
             }
         }
-        //光球收缩
+        // 光球收缩
         if (entity.isExpanding == 1) {
             entity.epicenterScale -= entity.SCALE_SPEED;
             if (entity.epicenterScale <= 0.5f) {
@@ -97,66 +101,84 @@ public class MushroomCloudBlockEntity extends BlockEntity {
                 entity.SCALE_SPEED = 0.3f;
             }
         }
-        //蘑菇云
+        // 蘑菇云
         if (entity.isExpanding == 2) {
             entity.rotation += 10;
-            if (entity.C_size < 10){
+            if (entity.C_size < 10) {
                 if (entity.SCALE_SPEED > 0.08) {
                     entity.SCALE_SPEED -= entity.SCALE_ACCELERATION;
-                }else entity.SCALE_SPEED=0.08f;
-                    entity.C_size += entity.SCALE_SPEED;
+                } else {
+                    entity.SCALE_SPEED = 0.08f;
+                }
+                entity.C_size += entity.SCALE_SPEED;
             }
         }
+
         if (!level.isClientSide()) {
+            // ---------- 读取 mobGriefing 游戏规则 ----------
+            boolean canGrief = false;
+            if (!canGrief) {
+                // 如果禁止破坏，直接将 last_y 置零，以便在动画结束后移除自身
+                entity.last_y = 0;
+            }
+
             entity.ticks++;
             if (entity.ticks % 2 == 0) {
-                if (entity.isExpanding == 2 ) {
-                    int shakeRadius = ModServerConfig.nuclearExplosion.Explosionlevel*ModServerConfig.nuclearExplosion.Explosionlevel+16;
+                // ----- 屏幕震动效果（不受 mobGriefing 影响） -----
+                if (entity.isExpanding == 2) {
+                    int shakeRadius = ModServerConfig.nuclearExplosion.Explosionlevel * ModServerConfig.nuclearExplosion.Explosionlevel + 16;
                     AABB area = new AABB(pos).inflate(shakeRadius);
                     List<Player> players = level.getEntitiesOfClass(Player.class, area);
-
                     for (Player player : players) {
                         double distance = player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ());
-                        // 简单的线性衰减
-                        float intensity = (float) Math.max(0, 1.0 - 1*(distance / (shakeRadius * shakeRadius)));
-
-                        if (intensity > 0.1f) { // 忽略太微弱的震动
-                            // 发送数据包到客户端
-                            entity.sendShakePacket(player, intensity*10+1, 40);
+                        float intensity = (float) Math.max(0, 1.0 - 1 * (distance / (shakeRadius * shakeRadius)));
+                        if (intensity > 0.1f) {
+                            entity.sendShakePacket(player, intensity * 10 + 1, 40);
                         }
                     }
                 }
-                int damageRadius = ModServerConfig.nuclearExplosion.Explosionlevel*ModServerConfig.nuclearExplosion.Explosionlevel;
-                AABB area_0 = new AABB(pos).inflate(damageRadius);
-                List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, area_0);
-                // 获取自定义伤害源
-                Holder<DamageType> damageTypeHolder = level.registryAccess().holderOrThrow(ModDamageTypes.NUCLEAR_EXPLOSION);
-                DamageSource damageSource =new DamageSource(damageTypeHolder);
-                for (LivingEntity living : entities) {
-                    // 计算距离，距离越近伤害越高
-                    double distance = living.distanceToSqr(pos.getX(), pos.getY(), pos.getZ());
-                    if (distance > damageRadius * damageRadius) continue;
-                    float damage = 75.0f * (1.0f - (float)(distance / (damageRadius * damageRadius)));
-                    if (damage < 1.0f) damage = 1.0f;
-                    living.hurt(damageSource, damage);
-                    living.setRemainingFireTicks(160);
-                    living.addEffect(new MobEffectInstance(
-                            MobEffects.WITHER,
-                            600,
-                            2,
-                            true,
-                            true
-                    ));
+
+                // ----- 实体伤害（仅在 canGrief 为 true 时执行） -----
+                if (canGrief) {
+                    int damageRadius = ModServerConfig.nuclearExplosion.Explosionlevel * ModServerConfig.nuclearExplosion.Explosionlevel;
+                    AABB area_0 = new AABB(pos).inflate(damageRadius);
+                    List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, area_0);
+                    Holder<DamageType> damageTypeHolder = level.registryAccess().holderOrThrow(ModDamageTypes.NUCLEAR_EXPLOSION);
+                    DamageSource damageSource = new DamageSource(damageTypeHolder);
+                    for (LivingEntity living : entities) {
+                        double distance = living.distanceToSqr(pos.getX(), pos.getY(), pos.getZ());
+                        if (distance > damageRadius * damageRadius) continue;
+                        float damage = 75.0f * (1.0f - (float) (distance / (damageRadius * damageRadius)));
+                        if (damage < 1.0f) damage = 1.0f;
+                        living.hurt(damageSource, damage);
+                        living.setRemainingFireTicks(160);
+                        living.addEffect(new MobEffectInstance(
+                                MobEffects.WITHER,
+                                600,
+                                2,
+                                true,
+                                true
+                        ));
+                    }
                 }
-                if (entity.D_tick <= entity.S_r)entity.D_tick ++;
-                if ( entity.D_tick <= entity.S_r) {
-                    if (entity.D_tick != entity.S_r) entity.removeSomething_ball(level, pos, entity.D_tick);
-                    if (entity.D_tick == 1){
-                        entity.clearDroppedItems(level,pos) ;
+
+                // ----- D_tick 计时（始终递增） -----
+                if (entity.D_tick <= entity.S_r) entity.D_tick++;
+
+                // ----- 第一阶段：球体破坏（仅在 canGrief 为 true 时破坏方块） -----
+                if (entity.D_tick <= entity.S_r) {
+                    if (canGrief && entity.D_tick != entity.S_r) {
+                        entity.removeSomething_ball(level, pos, entity.D_tick);
+                    }
+                    // 清理掉落物（不受 mobGriefing 影响）
+                    if (entity.D_tick == 1) {
+                        entity.clearDroppedItems(level, pos);
                         level.playSound(null, pos, ModSounds.NUCLEAR_EXPLOSION.get(),
-                            SoundSource.BLOCKS, 4.0f, 0.8f + level.getRandom().nextFloat() * 0.4f);}
-                    if (entity.D_tick == entity.S_r/2){
-                        int flashRadius = ModServerConfig.nuclearExplosion.Explosionlevel*ModServerConfig.nuclearExplosion.Explosionlevel;
+                                SoundSource.BLOCKS, 4.0f, 0.8f + level.getRandom().nextFloat() * 0.4f);
+                    }
+                    // 闪光效果（不受 mobGriefing 影响）
+                    if (entity.D_tick == entity.S_r / 2) {
+                        int flashRadius = ModServerConfig.nuclearExplosion.Explosionlevel * ModServerConfig.nuclearExplosion.Explosionlevel;
                         AABB area_1 = new AABB(pos).inflate(flashRadius);
                         List<Player> players = level.getEntitiesOfClass(Player.class, area_1);
                         for (Player player : players) {
@@ -168,38 +190,52 @@ public class MushroomCloudBlockEntity extends BlockEntity {
                         }
                     }
                 }
-                else if(entity.last_y > ModServerConfig.nuclearExplosion.Explosionlevel*2 ){
-                    entity.last_y=entity.removeSomething_circle(level, pos, entity.S_r+(ModServerConfig.nuclearExplosion.Explosionlevel*3-entity.last_y)
-                            *(ModServerConfig.nuclearExplosion.Explosionlevel*3-entity.last_y)/2,entity.last_y , false);//x^2/2+s_r
-                    if (!entity.level_2) entity.level_2=entity.removeSomething_ball_level_2(level, pos, entity.S_r*2);
+                // ----- 第二、三阶段：环形冲击波和球形二次破坏（仅在 canGrief 为 true 时执行） -----
+                else if (canGrief) {
+                    if (entity.last_y > ModServerConfig.nuclearExplosion.Explosionlevel * 2) {
+                        entity.last_y = entity.removeSomething_circle(level, pos,
+                                entity.S_r + (ModServerConfig.nuclearExplosion.Explosionlevel * 3 - entity.last_y)
+                                        * (ModServerConfig.nuclearExplosion.Explosionlevel * 3 - entity.last_y) / 2,
+                                entity.last_y, false);
+                        if (!entity.level_2)
+                            entity.level_2 = entity.removeSomething_ball_level_2(level, pos, entity.S_r * 2);
+                    } else if (entity.last_y > ModServerConfig.nuclearExplosion.Explosionlevel) {
+                        entity.last_y = entity.removeSomething_circle(level, pos,
+                                ModServerConfig.nuclearExplosion.Explosionlevel *
+                                        ModServerConfig.nuclearExplosion.Explosionlevel / 2 + entity.S_r,
+                                entity.last_y, false);
+                        if (!entity.level_2)
+                            entity.level_2 = entity.removeSomething_ball_level_2(level, pos, entity.S_r * 5);
+                    } else if (entity.last_y >= 0) {
+                        entity.last_y = entity.removeSomething_circle(level, pos,
+                                entity.S_r + entity.last_y * entity.last_y / 2,
+                                entity.last_y, true);
+                        if (!entity.level_2)
+                            entity.level_2 = entity.removeSomething_ball_level_2(level, pos, entity.S_r * 2);
+                    } else if (!entity.level_2) {
+                        entity.level_2 = entity.removeSomething_ball_level_2(level, pos, entity.S_r * 5);
+                    }
                 }
-                else if(entity.last_y > ModServerConfig.nuclearExplosion.Explosionlevel){
-                    entity.last_y=entity.removeSomething_circle(level, pos, ModServerConfig.nuclearExplosion.Explosionlevel*
-                            ModServerConfig.nuclearExplosion.Explosionlevel/2+entity.S_r,entity.last_y ,false);
-                    if (!entity.level_2) entity.level_2=entity.removeSomething_ball_level_2(level, pos, entity.S_r*5);
-                }
-                else if(entity.last_y >= 0 ){
-                    entity.last_y=entity.removeSomething_circle(level, pos, entity.S_r+entity.last_y*entity.last_y/2,entity.last_y ,true);//x^2/2+s_r
-                    if (!entity.level_2) entity.level_2=entity.removeSomething_ball_level_2(level, pos, entity.S_r*2);
-                }
-                else if (!entity.level_2) entity.level_2=entity.removeSomething_ball_level_2(level, pos, entity.S_r*5);
+
+                // ----- 爆炸结束，移除自身（无论是否破坏） -----
                 if (entity.C_size >= 10 && entity.last_y == 0) {
-                    level.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);}
+                    level.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
+                }
             }
         }
     }
 
-    private void removeSomething_ball(Level level, BlockPos center,int r )  {
+    // ---------- 以下私有方法保持不变 ----------
+    private void removeSomething_ball(Level level, BlockPos center, int r) {
         for (int x = -r; x <= r; x++) {
             for (int z = -r; z <= r; z++) {
                 for (int y = -r; y <= r; y++) {
-                    // 判断是否在球内
-                    if (x*x + z*z + y*y <= r*r) {
+                    if (x * x + z * z + y * y <= r * r) {
                         BlockPos target = center.offset(x, y, z);
                         BlockState state = level.getBlockState(target);
                         if (level.isEmptyBlock(target)) continue;
-                        if (level.isOutsideBuildHeight(target))continue;
-                        if (!state.is(BlockTags.WITHER_IMMUNE)  && !state.isAir() && !state.is(ModBlock.MUSHROOM_CLOUD)) {
+                        if (level.isOutsideBuildHeight(target)) continue;
+                        if (!state.is(BlockTags.WITHER_IMMUNE) && !state.isAir() && !state.is(ModBlock.MUSHROOM_CLOUD)) {
                             level.setBlock(target, Blocks.AIR.defaultBlockState(), 11);
                         }
                     }
@@ -207,18 +243,18 @@ public class MushroomCloudBlockEntity extends BlockEntity {
             }
         }
     }
-    private boolean removeSomething_ball_level_2(Level level, BlockPos center,int r )  {
+
+    private boolean removeSomething_ball_level_2(Level level, BlockPos center, int r) {
         int count = 0;
         for (int x = -r; x <= r; x++) {
             for (int z = -r; z <= r; z++) {
                 for (int y = r; y >= -3; y--) {
-                    // 判断是否在球内
-                    if (x*x + z*z + y*y <= r*r) {
-                        BlockPos target = center.offset(x, y+this.S_r/2, z);
+                    if (x * x + z * z + y * y <= r * r) {
+                        BlockPos target = center.offset(x, y + this.S_r / 2, z);
                         BlockState state = level.getBlockState(target);
                         if (level.isEmptyBlock(target)) continue;
-                        if (level.isOutsideBuildHeight(target))continue;
-                        if (!state.is(BlockTags.WITHER_IMMUNE)  && !state.isAir() && !state.is(ModBlock.MUSHROOM_CLOUD)) {
+                        if (level.isOutsideBuildHeight(target)) continue;
+                        if (!state.is(BlockTags.WITHER_IMMUNE) && !state.isAir() && !state.is(ModBlock.MUSHROOM_CLOUD)) {
                             level.setBlock(target, Blocks.AIR.defaultBlockState(), 11);
                             count++;
                         }
@@ -227,57 +263,54 @@ public class MushroomCloudBlockEntity extends BlockEntity {
                         }
                     }
                 }
-                if (count >= 2500) {
-                    break;
-                }
+                if (count >= 2500) break;
             }
-            if (count >= 2500) {
-                break;
-            }
+            if (count >= 2500) break;
         }
-        return count < 2500 ? true : false;
+        return count < 2500;
     }
-private int removeSomething_circle(Level level, BlockPos center, int r, int y , boolean fire) {
-    for (int x = -r; x <= r; x++) {
-        for (int z = -r; z <= r; z++) {
-            // 判断是否在圆内
-            if (x * x + z * z <= r * r) {
-                BlockPos target = center.offset(x, y - this.S_r / 2, z);
-                BlockState state = level.getBlockState(target);
-                // 跳过无效位置
-                if (level.isOutsideBuildHeight(target)) continue;
-                // 检查是否应该摧毁
-                if (!state.is(BlockTags.WITHER_IMMUNE) &&
-                    !state.isAir() &&
-                    !state.is(ModBlock.MUSHROOM_CLOUD) &&
-                    !state.is(Blocks.WATER)) {
-                    level.setBlock(target, Blocks.AIR.defaultBlockState(), 11);
-                    if (level.getRandom().nextFloat() < 0.3f && fire) {
-                        level.setBlock(target, Blocks.FIRE.defaultBlockState(), 11 | 2);
+
+    private int removeSomething_circle(Level level, BlockPos center, int r, int y, boolean fire) {
+        for (int x = -r; x <= r; x++) {
+            for (int z = -r; z <= r; z++) {
+                if (x * x + z * z <= r * r) {
+                    BlockPos target = center.offset(x, y - this.S_r / 2, z);
+                    BlockState state = level.getBlockState(target);
+                    if (level.isOutsideBuildHeight(target)) continue;
+                    if (!state.is(BlockTags.WITHER_IMMUNE) &&
+                            !state.isAir() &&
+                            !state.is(ModBlock.MUSHROOM_CLOUD) &&
+                            !state.is(Blocks.WATER)) {
+                        level.setBlock(target, Blocks.AIR.defaultBlockState(), 11);
+                        if (level.getRandom().nextFloat() < 0.3f && fire) {
+                            level.setBlock(target, Blocks.FIRE.defaultBlockState(), 11 | 2);
+                        }
                     }
                 }
             }
         }
+        return y - 1;
     }
-    return  y -= 1;
-}
+
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
     private void clearDroppedItems(Level level, BlockPos center) {
-        AABB area = new AABB(center).inflate(3); // 3x3x3范围
+        AABB area = new AABB(center).inflate(3);
         List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, area);
         for (ItemEntity item : items) {
             item.discard();
         }
     }
-    //发包
+
     private void sendShakePacket(Player player, float intensity, int duration) {
         if (player instanceof ServerPlayer serverPlayer) {
             PacketDistributor.sendToPlayer(serverPlayer, new ShakePayload(intensity, duration));
         }
     }
+
     private void sendFlashPacket(Player player, float intensity, int duration) {
         if (player instanceof ServerPlayer serverPlayer) {
             PacketDistributor.sendToPlayer(serverPlayer, new FlashPayload(intensity, duration));

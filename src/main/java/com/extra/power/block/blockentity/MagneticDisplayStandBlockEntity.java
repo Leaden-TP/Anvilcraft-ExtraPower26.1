@@ -122,7 +122,7 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
             double target = target_state.get(i).doubleValue();
             double distance = Math.abs(current - target);
 
-            if (distance <= 0.03) {
+            if (distance <= 0.05) {
                 entity.action_state.set(i, target);
                 continue;
             }
@@ -135,7 +135,7 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
             }
         }
 
-        if (!level.isClientSide() && entity.action_t % 3 == 0) {
+        if (!level.isClientSide() && entity.action_t % 2 == 0) {
 
             entity.loading = !state.getValue(OVERLOAD) && !(entity.RP==15);
             entity.action_t = 0;

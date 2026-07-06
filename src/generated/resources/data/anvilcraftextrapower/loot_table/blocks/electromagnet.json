@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "anvilcraftextrapower:earth"
+          "name": "anvilcraftextrapower:electromagnet"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "anvilcraftextrapower:blocks/earth"
+  "random_sequence": "anvilcraftextrapower:blocks/electromagnet"
 }

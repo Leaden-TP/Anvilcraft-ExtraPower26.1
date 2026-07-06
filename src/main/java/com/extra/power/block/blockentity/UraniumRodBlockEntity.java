@@ -5,8 +5,6 @@ import com.extra.power.block.just_block.UraniumRodBlock;
 import dev.dubhe.anvilcraft.block.state.Vertical3PartHalf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -36,8 +34,8 @@ public class UraniumRodBlockEntity extends BlockEntity {
             if(!state.getValue(UraniumRodBlock.UNDER_CONTROL) && !(state.getValue(UraniumRodBlock.ACTIVE)<5)
             && state.getValue(UraniumRodBlock.ACTIVE)>0){
             AABB area = new AABB(pos).inflate(RADIUS*state.getValue(UraniumRodBlock.ACTIVE));
-            for (LivingEntity living : ((ServerLevel)level).getEntitiesOfClass(
-                    LivingEntity.class, area)) {
+            for (LivingEntity living :
+                    ((ServerLevel)level).getEntitiesOfClass(LivingEntity.class, area)) {
                 // 添加凋零效果
                 living.addEffect(new MobEffectInstance(
                         MobEffects.WITHER,
