@@ -1,16 +1,20 @@
 package com.extra.power.block.blockentity;
 
+import com.extra.power.block.ModBlock;
 import com.extra.power.block.ModBlockEntity;
 import com.extra.power.block.just_block.ElectromagnetBlock;
+import com.extra.power.init.ModItemTags;
 import dev.dubhe.anvilcraft.AnvilCraft;
 import dev.dubhe.anvilcraft.api.power.IPowerConsumer;
 import dev.dubhe.anvilcraft.api.power.PowerGrid;
 import dev.dubhe.anvilcraft.init.block.ModBlockTags;
+import dev.dubhe.anvilcraft.item.tool.AnvilHammerItem;
 import dev.dubhe.anvilcraft.util.TriggerUtil;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -20,14 +24,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.WeakHashMap;
+
 import static com.extra.power.block.just_block.ElectromagnetBlock.LIT;
 
 
 public class ElectromagnetBlockEntity extends BlockEntity implements IPowerConsumer {
     private static final double ACCELERATION = 0.5;
-    private static final int RANGE = AnvilCraft.CONFIG.magnetAttractsDistance*4;
+    private static final int RANGE = AnvilCraft.CONFIG.magnetAttractsDistance*5;
     private static int tickCounter = 0;
+    private static final WeakHashMap<Level, HashSet<BlockPos>> LEVEL_ELECTROMAGNET_MAP = new WeakHashMap<>();
     @Getter
     private PowerGrid grid;
     public ElectromagnetBlockEntity(BlockPos pos, BlockState state) {
@@ -47,21 +55,41 @@ public class ElectromagnetBlockEntity extends BlockEntity implements IPowerConsu
         if (level == null || level.isClientSide()) return;
         this.flushState(level, pos);
         entity.tickCounter++;
-        AABB area = new AABB(
-                pos.getX(), pos.getY() + 1, pos.getZ(),
-                pos.getX() + 1, pos.getY() + RANGE + 1, pos.getZ() + 1
-        );
-        List<FallingBlockEntity> fallingBlocks = level.getEntitiesOfClass(
-                FallingBlockEntity.class,
-                area,
-                e -> e.getBlockState().is(BlockTags.ANVIL)
-        );
-        for (FallingBlockEntity falling : fallingBlocks) {
-            falling.setDeltaMovement(falling.getDeltaMovement().add(0, -ACCELERATION, 0));
-        }
         if (entity.tickCounter%2==0){
             entity.attract(state, level, pos);
             entity.tickCounter=0;
+        }
+        if (state.getValue(LIT) || state.getValue(ElectromagnetBlock.OVERLOAD)) return;
+        AABB area = new AABB(
+                pos.getX(), pos.getY() + 1, pos.getZ(),
+                pos.getX() + 1, pos.getY() + RANGE + 1, pos.getZ() + 1);
+
+        AABB downBox = new AABB(
+                pos.getX() - 0.5, pos.getY() - RANGE, pos.getZ() - 0.5,
+                pos.getX() + 1.5, pos.getY(), pos.getZ() + 1.5);
+
+        List<FallingBlockEntity> fallingBlocks = level.getEntitiesOfClass(
+                FallingBlockEntity.class,
+                area,
+                e -> e.getBlockState().is(BlockTags.ANVIL));
+
+        List<Player> playersUp = level.getEntitiesOfClass(Player.class, area,
+                p -> isWearingAnvilHammer(p));
+
+        List<Player> playersDown = level.getEntitiesOfClass(Player.class, downBox,
+                p -> isWearingAnvilHammer(p));
+
+        for (FallingBlockEntity falling : fallingBlocks) {
+            falling.setDeltaMovement(falling.getDeltaMovement().add(0, -ACCELERATION, 0));
+        }
+
+        for (Player player : playersDown) {
+            player.setDeltaMovement(player.getDeltaMovement().add(0, ACCELERATION/5, 0));
+            player.hurtMarked = true;
+        }
+        for (Player player :  playersUp) {
+            player.setDeltaMovement(player.getDeltaMovement().add(0, -ACCELERATION/5, 0));
+            player.hurtMarked = true;
         }
     }
 
@@ -69,10 +97,9 @@ public class ElectromagnetBlockEntity extends BlockEntity implements IPowerConsu
         if (level.isClientSide()) return;
         if (state.getValue(LIT) || state.getValue(ElectromagnetBlock.OVERLOAD)) return;
         if (level.getBlockState(magnetPos.below()).is(BlockTags.ANVIL)) return;
-        int distance = AnvilCraft.CONFIG.magnetAttractsDistance*4;
         BlockPos currentPos = magnetPos;
         checkAnvil:
-        for (int i = 0; i < distance; i++) {
+        for (int i = 0; i < RANGE; i++) {
             currentPos = currentPos.below();
             BlockState state1 = level.getBlockState(currentPos);
 
@@ -119,5 +146,25 @@ public class ElectromagnetBlockEntity extends BlockEntity implements IPowerConsu
     @Override
     public void setGrid(@Nullable PowerGrid grid) {
         this.grid = grid;
+    }
+    private static boolean isWearingAnvilHammer(Player player) {
+        return player.getMainHandItem().getItem() instanceof AnvilHammerItem;
+    }
+
+    private void addSelfToMap() {
+        if (level == null) return;
+        LEVEL_ELECTROMAGNET_MAP.computeIfAbsent(level, k -> new HashSet<>()).add(getBlockPos());
+    }
+
+    private void removeSelfFromMap() {
+        if (level == null) return;
+        HashSet<BlockPos> set = LEVEL_ELECTROMAGNET_MAP.get(level);
+        if (set != null) set.remove(getBlockPos());
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        removeSelfFromMap();
     }
 }

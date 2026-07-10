@@ -309,6 +309,116 @@ public class ModBlock {
             .build()
             .tag(BlockTags.ANVIL, BlockTags.MINEABLE_WITH_AXE, ModBlockTags.NON_MAGNETIC, ModBlockTags.CANT_BROKEN_ANVIL)
             .register();
+    public static final BlockEntry<? extends Block> SIGN = REGISTRATE.block("sign_base",
+                    SignBlock::new)
+            .lang("Sign Base")
+            .initialProperties(() -> Blocks.LIGHT_BLUE_WOOL)
+            .properties(p -> p
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
+    public static final BlockEntry<? extends Block> SIGN_ANVIL_FALL = REGISTRATE.block("sign_anvil_fall",
+                    SignBlock::new)
+            .lang("Sign Anvil Fall")
+            .initialProperties(() -> Blocks.LIGHT_BLUE_WOOL)
+            .properties(p -> p
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
+    public static final BlockEntry<? extends Block> SIGN_CONSTRUCTION = REGISTRATE.block("sign_construction",
+                    SignBlock::new)
+            .lang("Sign Construction")
+            .initialProperties(() -> Blocks.LIGHT_BLUE_WOOL)
+            .properties(p -> p
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
+    public static final BlockEntry<? extends Block> SIGN_DO_NOT_OPERATE = REGISTRATE.block("sign_do_not_operate",
+                    SignBlock::new)
+            .lang("Sign Don't Operate")
+            .initialProperties(() -> Blocks.LIGHT_BLUE_WOOL)
+            .properties(p -> p
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
+    public static final BlockEntry<? extends Block> SIGN_HIGHSPEED_ANVIL = REGISTRATE.block("sign_highspeed_anvil",
+                    SignBlock::new)
+            .lang("Sign Highspeed Anvil")
+            .initialProperties(() -> Blocks.LIGHT_BLUE_WOOL)
+            .properties(p -> p
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
+    public static final BlockEntry<? extends Block> SIGN_LASER_HAZARD = REGISTRATE.block("sign_laser_hazard",
+                    SignBlock::new)
+            .lang("Sign Laser Hazard")
+            .initialProperties(() -> Blocks.LIGHT_BLUE_WOOL)
+            .properties(p -> p
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
+    public static final BlockEntry<? extends Block> SIGN_RADIATION = REGISTRATE.block("sign_radiation",
+                    SignBlock::new)
+            .lang("Sign Radiation")
+            .initialProperties(() -> Blocks.LIGHT_BLUE_WOOL)
+            .properties(p -> p
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
+    public static final BlockEntry<? extends Block> SIGN_TIME_HAZARD = REGISTRATE.block("sign_time_hazard",
+                    SignBlock::new)
+            .lang("Sign Time Hazard")
+            .initialProperties(() -> Blocks.LIGHT_BLUE_WOOL)
+            .properties(p -> p
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
+    public static final BlockEntry<? extends Block> SIGN_STRONG_GRAVITY = REGISTRATE.block("sign_strong_gravity",
+                    SignBlock::new)
+            .lang("Sign Strong Gravity")
+            .initialProperties(() -> Blocks.LIGHT_BLUE_WOOL)
+            .properties(p -> p
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
+    public static final BlockEntry<? extends Block> SIGN_MAGNETIC_FIELD = REGISTRATE.block("sign_magnetic_field",
+                    SignBlock::new)
+            .lang("Sign Magnetic Field")
+            .initialProperties(() -> Blocks.LIGHT_BLUE_WOOL)
+            .properties(p -> p
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never))
+            .blockstate(DataGenUtil::noExtraModelOrState)
+            .item()
+            .build()
+            .register();
     public static void register() {
     }
 }
