@@ -112,20 +112,22 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
 
     // ---------- Tick ----------
     public void tick(Level level, BlockPos pos, BlockState state, MagneticDisplayStandBlockEntity entity) {
-        if (getDisplayItemStack().isEmpty()) {
-            entity.action_state = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));}
+        if (getDisplayItemStack().isEmpty()){entity.action_state=new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));}
         List<Float> target_state = Arrays.asList(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-        if (entity.loading && getDisplayItemStack().getItem() instanceof BlockItem) {
-            target_state = Arrays.asList(0.0f, entity.userHeightOffset*(15-entity.rp)/15, 0.0f, 0.0f, (float) level.getGameTime() % 360, 0.0f);
-        } else if (entity.loading) {
-            target_state = Arrays.asList(0.0f, entity.userHeightOffset*(15-entity.rp)/15, 0.125f, -90.0f, (float) level.getGameTime() % 360, 0.0f);
+
+        if (entity.loading && getDisplayItemStack().getItem() instanceof BlockItem){
+            target_state = Arrays.asList(0.0f, entity.userHeightOffset*(15-entity.rp)/15, 0.0f, 0.0f, (float)level.getGameTime()%180, 0.0f);
         }
+
+        else if (entity.loading){
+            target_state = Arrays.asList(0.0f, entity.userHeightOffset*(15-entity.rp)/15, 0.125f, -90.0f, (float)level.getGameTime()%180, 0.0f);}
+
         for (int i = 0; i < entity.action_state.size(); i++) {
             double current = entity.action_state.get(i);
             double target = target_state.get(i).doubleValue();
             double distance = Math.abs(current - target);
 
-            if (distance <= 0.02) {
+            if (distance <= 0.03) {
                 entity.action_state.set(i, target);
                 continue;
             }
@@ -134,29 +136,32 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
             if (current < target) {
                 entity.action_state.set(i, current + step);
                 entity.is_finished=false;
-            } else {
+            }
+            else {
                 entity.action_state.set(i, current - step);
                 entity.is_finished=false;
             }
         }
 
-        if (!level.isClientSide() && entity.action_t % 2 == 0) {
-            entity.loading = !state.getValue(OVERLOAD) && !(entity.rp==15);
+        if (!level.isClientSide() && entity.action_t % 3 == 0) {
+            if ((!state.getValue(OVERLOAD) && !(entity.rp==15)) != entity.loading) {
+                entity.loading = !state.getValue(OVERLOAD) && !(entity.rp==15);
+            }
+            entity.rp = level.getBestNeighborSignal(pos);
             entity.action_t = 0;
         }
         if (!level.isClientSide() && entity.is_finished && getDisplayItemStack().isEmpty()) {return;}
+
         if (!level.isClientSide()) {
             this.flushState(level, pos);
             entity.action_t++;
             entity.syncTimer++;
-            entity.rp = level.getBestNeighborSignal(pos);
             if (entity.syncTimer >= SYNC_INTERVAL) {
                 entity.syncTimer = 0;
                 entity.syncDisplayItemPeriodically();
             }
             entity.syncAnimationState();
         }
-
     }
     public Boolean isLocked() {
         return this.locked ;

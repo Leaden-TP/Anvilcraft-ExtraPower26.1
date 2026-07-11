@@ -80,6 +80,7 @@ public class MagneticDisplayStandRenderer implements BlockEntityRenderer<Magneti
         float yAdd = actionState.get(1).floatValue();
         float zAdd = actionState.get(2).floatValue();
         float rotY = actionState.get(4).floatValue();
+        float rotX = actionState.get(3).floatValue();
         if (state.getFinished()) {
             rotY = state.getRotation();
         }
@@ -101,7 +102,7 @@ public class MagneticDisplayStandRenderer implements BlockEntityRenderer<Magneti
             double y = 1.0 + modelDepth / 4;
             double z = 0.375;
             pose.translate(x + xAdd, y + yAdd, z + zAdd);
-            pose.mulPose(Axis.XP.rotationDegrees(90.0f));
+            pose.mulPose(Axis.XP.rotationDegrees(90.0f+rotX));
             pose.mulPose(Axis.YP.rotationDegrees(rotY));
         }
         cluster.item.submit(pose, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
