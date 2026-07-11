@@ -1,6 +1,8 @@
 package com.extra.power.client.renderer.blockentity;
 
+import com.extra.power.block.blockentity.FrostControllerBlockEntity;
 import com.extra.power.block.blockentity.MagneticDisplayStandBlockEntity;
+import com.extra.power.block.just_block.FrostControllerBlock;
 import com.extra.power.client.renderer.blockentity.state.MagneticDisplayStandRendererState;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -15,11 +17,15 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+
+import static com.extra.power.block.just_block.MagneticDisplayStandBlock.OVERLOAD;
 
 public class MagneticDisplayStandRenderer implements BlockEntityRenderer<MagneticDisplayStandBlockEntity, MagneticDisplayStandRendererState> {
     @SuppressWarnings("unused")
@@ -52,8 +58,9 @@ public class MagneticDisplayStandRenderer implements BlockEntityRenderer<Magneti
         }
         List<Double> actionState = be.getAction_state();
         if (actionState != null && actionState.size() >= 6) {
-            state.setActionState(actionState);
-        }
+            state.setActionState(actionState);}
+        state.setFinished(be.getFinished());
+        state.setRotation(this.rotation(be, partialTicks));
     }
 
     @Override
@@ -72,10 +79,10 @@ public class MagneticDisplayStandRenderer implements BlockEntityRenderer<Magneti
         float xAdd = actionState.get(0).floatValue();
         float yAdd = actionState.get(1).floatValue();
         float zAdd = actionState.get(2).floatValue();
-        float rotX = actionState.get(3).floatValue();
         float rotY = actionState.get(4).floatValue();
-        float rotZ = actionState.get(5).floatValue();
-
+        if (state.getFinished()) {
+            rotY = state.getRotation();
+        }
         ItemClusterRenderState cluster = state.getDisplayState();
         if (cluster == null) return;
 
@@ -100,7 +107,15 @@ public class MagneticDisplayStandRenderer implements BlockEntityRenderer<Magneti
         cluster.item.submit(pose, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
         pose.popPose();
     }
-
+    private float rotation(MagneticDisplayStandBlockEntity entity, float partialTick) {
+            Level level = entity.getLevel();
+            if (level != null) {
+                // 使用游戏时间 + partialTick 动态计算旋转角度
+                float angle = level.getGameTime() + partialTick;
+                return angle;
+            }
+        return 0;
+    }
     // ---------- 大范围渲染支持 ----------
     @Override
     public AABB getRenderBoundingBox(MagneticDisplayStandBlockEntity blockEntity) {
