@@ -240,7 +240,7 @@ public class ModBlock {
             .lang("Nuclear Bomb")
             .initialProperties(() -> Blocks.ANVIL)
             .properties(p -> p.strength(5f, 1200f).lightLevel(state -> 15).noOcclusion())
-            .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.WITHER_IMMUNE)
+            .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.WITHER_IMMUNE,BlockTags.ANVIL)
             .blockstate(DataGenUtil::noExtraModelOrState)
             .item()
             .build()
@@ -304,10 +304,11 @@ public class ModBlock {
             .initialProperties(() -> Blocks.CAKE)
             .properties(p -> p.noOcclusion().isValidSpawn(Blocks::never))
             .blockstate(DataGenUtil::noExtraModelOrState)
+            .tag(BlockTags.ANVIL, BlockTags.MINEABLE_WITH_AXE, ModBlockTags.NON_MAGNETIC, ModBlockTags.CANT_BROKEN_ANVIL)
             .item()
             .tag(ItemTags.ANVIL)
             .build()
-            .tag(BlockTags.ANVIL, BlockTags.MINEABLE_WITH_AXE, ModBlockTags.NON_MAGNETIC, ModBlockTags.CANT_BROKEN_ANVIL)
+
             .register();
     public static final BlockEntry<? extends Block> SIGN = REGISTRATE.block("sign_base",
                     SignBlock::new)

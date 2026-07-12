@@ -15,8 +15,6 @@ public class MagneticDisplayStandRendererState extends BlockEntityRenderState {
     private ItemStack display = ItemStack.EMPTY;          // 展示的物品，永不为 null
     @Nullable private ItemClusterRenderState displayState; // 物品渲染状态
     private List<Double> actionState;                     // 动画状态
-    private boolean finished;                    // 动画是否完成
-    private float rotation;
 
     public ItemStack getDisplay() {
         return display;
@@ -43,15 +41,5 @@ public class MagneticDisplayStandRendererState extends BlockEntityRenderState {
         this.actionState = actionState;
     }
 
-    public boolean getFinished() {return finished;}
 
-    public void setFinished(boolean finished) {this.finished = finished;}
-
-    public float getRotation() {
-        return this.rotation;
-    }
-
-    public void setRotation(final float rotation) {
-        this.rotation = rotation;
-    }
 }

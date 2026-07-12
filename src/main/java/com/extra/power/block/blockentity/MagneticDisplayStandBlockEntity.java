@@ -1,5 +1,6 @@
 package com.extra.power.block.blockentity;
 
+import com.extra.power.api.entity.IEasyAnimation;
 import com.extra.power.api.entity.IScrollAdjustable;
 import com.extra.power.block.ModBlockEntity;
 import com.extra.power.network.UpdateAnimationStatePacket;
@@ -7,6 +8,7 @@ import dev.dubhe.anvilcraft.api.IHasDisplayItem;
 import dev.dubhe.anvilcraft.api.itemhandler.FilteredItemStackHandler;
 import dev.dubhe.anvilcraft.api.itemhandler.IItemResourceHandlerHolder;
 import dev.dubhe.anvilcraft.api.power.IPowerConsumer;
+import dev.dubhe.anvilcraft.api.power.PowerComponentType;
 import dev.dubhe.anvilcraft.api.power.PowerGrid;
 import dev.dubhe.anvilcraft.network.UpdateDisplayItemPacket;
 import lombok.Getter;
@@ -39,7 +41,7 @@ import static com.extra.power.block.just_block.MagneticDisplayStandBlock.OVERLOA
 import static com.extra.power.block.just_block.MagneticDisplayStandBlock.RP;
 
 public class MagneticDisplayStandBlockEntity extends BlockEntity
-        implements IPowerConsumer, IHasDisplayItem, IScrollAdjustable, IItemResourceHandlerHolder {
+        implements IPowerConsumer, IHasDisplayItem, IScrollAdjustable, IItemResourceHandlerHolder, IEasyAnimation {
 
     private float userHeightOffset = 0.5f;
     private static final float MIN_HEIGHT_OFFSET = 0.0f;
@@ -48,10 +50,13 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
     private static final int SYNC_INTERVAL = 40;
     private int action_t = 0;
     private int syncTimer = 0;
+    @Getter
+    private int preRotation = 0;
+    @Getter
+    private int rotation = 0;
     private boolean loading = false;
     private boolean locked = false;
     private int rp = 0;
-    private boolean is_finished = true;
     @Getter
     private List<Double> action_state = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     @Getter
@@ -114,13 +119,15 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
     public void tick(Level level, BlockPos pos, BlockState state, MagneticDisplayStandBlockEntity entity) {
         if (getDisplayItemStack().isEmpty()){entity.action_state=new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));}
         List<Float> target_state = Arrays.asList(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-
+        if (this.rotation == 360) this.rotation = 0;
+        this.preRotation = this.rotation;
+        this.rotation += 2;
         if (entity.loading && getDisplayItemStack().getItem() instanceof BlockItem){
-            target_state = Arrays.asList(0.0f, entity.userHeightOffset*(15-entity.rp)/15, 0.0f, 0.0f, (float)level.getGameTime()%180, 0.0f);
+            target_state = Arrays.asList(0.0f, entity.userHeightOffset*(15-entity.rp)/15, 0.0f, 0.0f, (float)this.rotation, 0.0f);
         }
 
         else if (entity.loading){
-            target_state = Arrays.asList(0.0f, entity.userHeightOffset*(15-entity.rp)/15, 0.125f, -90.0f, (float)level.getGameTime()%180, 0.0f);}
+            target_state = Arrays.asList(0.0f, entity.userHeightOffset*(15-entity.rp)/15, 0.125f, -90.0f, (float)this.rotation, 0.0f);}
 
         for (int i = 0; i < entity.action_state.size(); i++) {
             double current = entity.action_state.get(i);
@@ -135,11 +142,9 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
             double step = Math.clamp(distance / 10, 0.01, distance);
             if (current < target) {
                 entity.action_state.set(i, current + step);
-                entity.is_finished=false;
             }
             else {
                 entity.action_state.set(i, current - step);
-                entity.is_finished=false;
             }
         }
 
@@ -150,7 +155,7 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
             entity.rp = level.getBestNeighborSignal(pos);
             entity.action_t = 0;
         }
-        if (!level.isClientSide() && entity.is_finished && getDisplayItemStack().isEmpty()) {return;}
+        if (!level.isClientSide()  && getDisplayItemStack().isEmpty()) {return;}
 
         if (!level.isClientSide()) {
             this.flushState(level, pos);
@@ -222,10 +227,6 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
             );
         }
     }
-    public boolean getFinished() {
-        return this.is_finished && !getBlockState().getValue(OVERLOAD) && !getBlockState().getValue(RP);
-    }
-
     // ---------- 物品操作 ----------
     public ItemStack getItemstack() {
         return itemHandler.getResource(0).toStack(itemHandler.getAmountAsInt(0));
@@ -323,6 +324,8 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
     public int getInputPower() {
         return POWER;
     }
+
+
 
     @Override
     public void setGrid(@Nullable PowerGrid grid) {

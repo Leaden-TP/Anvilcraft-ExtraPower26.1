@@ -55,11 +55,12 @@ public class ElectromagnetBlockEntity extends BlockEntity implements IPowerConsu
         if (level == null || level.isClientSide()) return;
         this.flushState(level, pos);
         entity.tickCounter++;
+
+        if (state.getValue(LIT) || state.getValue(ElectromagnetBlock.OVERLOAD)) return;
         if (entity.tickCounter%2==0){
-            entity.attract(state, level, pos);
+            this.attract(state, level, pos);
             entity.tickCounter=0;
         }
-        if (state.getValue(LIT) || state.getValue(ElectromagnetBlock.OVERLOAD)) return;
         AABB area = new AABB(
                 pos.getX(), pos.getY() + 1, pos.getZ(),
                 pos.getX() + 1, pos.getY() + RANGE + 1, pos.getZ() + 1);
@@ -95,7 +96,6 @@ public class ElectromagnetBlockEntity extends BlockEntity implements IPowerConsu
 
     private void attract(BlockState state, Level level, BlockPos magnetPos) {
         if (level.isClientSide()) return;
-        if (state.getValue(LIT) || state.getValue(ElectromagnetBlock.OVERLOAD)) return;
         if (level.getBlockState(magnetPos.below()).is(BlockTags.ANVIL)) return;
         BlockPos currentPos = magnetPos;
         checkAnvil:

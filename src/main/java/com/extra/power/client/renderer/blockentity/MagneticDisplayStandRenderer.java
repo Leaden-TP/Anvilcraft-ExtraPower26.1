@@ -59,8 +59,6 @@ public class MagneticDisplayStandRenderer implements BlockEntityRenderer<Magneti
         List<Double> actionState = be.getAction_state();
         if (actionState != null && actionState.size() >= 6) {
             state.setActionState(actionState);}
-        state.setFinished(be.getFinished());
-        state.setRotation(this.rotation(be, partialTicks));
     }
 
     @Override
@@ -81,9 +79,6 @@ public class MagneticDisplayStandRenderer implements BlockEntityRenderer<Magneti
         float zAdd = actionState.get(2).floatValue();
         float rotY = actionState.get(4).floatValue();
         float rotX = actionState.get(3).floatValue();
-        if (state.getFinished()) {
-            rotY = state.getRotation();
-        }
         ItemClusterRenderState cluster = state.getDisplayState();
         if (cluster == null) return;
 

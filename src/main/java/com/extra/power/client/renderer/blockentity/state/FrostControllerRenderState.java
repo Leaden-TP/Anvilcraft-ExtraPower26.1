@@ -3,11 +3,12 @@ package com.extra.power.client.renderer.blockentity.state;
 import net.minecraft.client.renderer.block.BlockModelRenderState;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 
+import java.util.List;
+
 public class FrostControllerRenderState extends BlockEntityRenderState {
     private BlockModelRenderState cube;
     private float elevation;
-    private float rotation;
-
+    private List<Double> actionState;
     public BlockModelRenderState getCube() {
         return this.cube;
     }
@@ -16,8 +17,12 @@ public class FrostControllerRenderState extends BlockEntityRenderState {
         return this.elevation;
     }
 
-    public float getRotation() {
-        return this.rotation;
+    public List<Double> getActionState() {
+        return actionState;
+    }
+
+    public void setActionState(List<Double> actionState) {
+        this.actionState = actionState;
     }
 
     public void setCube(final BlockModelRenderState cube) {
@@ -28,7 +33,4 @@ public class FrostControllerRenderState extends BlockEntityRenderState {
         this.elevation = elevation;
     }
 
-    public void setRotation(final float rotation) {
-        this.rotation = rotation;
-    }
 }

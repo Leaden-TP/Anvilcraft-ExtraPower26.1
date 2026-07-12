@@ -1,5 +1,6 @@
 package com.extra.power.network;
 
+import com.extra.power.api.entity.IEasyAnimation;
 import com.extra.power.block.blockentity.MagneticDisplayStandBlockEntity;
 import com.extra.power.init.AnvilCraftExtrapower;
 import dev.anvilcraft.lib.v2.network.packet.IClientboundPacket;
@@ -49,7 +50,7 @@ public record UpdateAnimationStatePacket(List<Double> actionState, BlockPos pos)
     public void handleOnClient(Player player) {
         if (player.level().isClientSide()) {
             var level = player.level();
-            if (level.getBlockEntity(pos) instanceof MagneticDisplayStandBlockEntity be) {
+            if (level.getBlockEntity(pos) instanceof IEasyAnimation be) {
                 be.updateActionState(actionState);
             }
         }

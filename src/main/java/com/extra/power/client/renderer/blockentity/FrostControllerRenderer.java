@@ -19,6 +19,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 public class FrostControllerRenderer implements BlockEntityRenderer<FrostControllerBlockEntity, FrostControllerRenderState> {
     private static final float ROTATION_SPEED = 0.5f;
     public static final StandaloneModelKey<BlockStateModel> CUBE = new StandaloneModelKey<>(
@@ -43,7 +45,9 @@ public class FrostControllerRenderer implements BlockEntityRenderer<FrostControl
     ) {
         BlockEntityRenderer.super.extractRenderState(be, state, partialTicks, cameraPosition, breakProgress);
         state.setCube(FeatureRendererSupport.initialize(this.getModel(), be));
-        state.setRotation(this.rotation(be, partialTicks));
+        List<Double> actionState = be.getAction_state();
+        if (actionState != null) {
+            state.setActionState(actionState);}
         state.setElevation(this.elevation());
     }
 
@@ -57,8 +61,8 @@ public class FrostControllerRenderer implements BlockEntityRenderer<FrostControl
 
         pose.pushPose();
         pose.translate(0.5F, 0.5f, 0.5F);
-        pose.mulPose(Axis.YP.rotationDegrees(state.getRotation()));
-        pose.mulPose(Axis.ZP.rotationDegrees(state.getRotation()));
+        pose.mulPose(Axis.YP.rotationDegrees(state.getActionState().get(0).floatValue()));
+        pose.mulPose(Axis.ZP.rotationDegrees(state.getActionState().get(0).floatValue()));
 
         state.getCube().submit(pose, submit, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
         pose.popPose();
@@ -67,18 +71,8 @@ public class FrostControllerRenderer implements BlockEntityRenderer<FrostControl
     protected StandaloneModelKey<BlockStateModel> getModel() {
         return CUBE;
     }
-    private float rotation(FrostControllerBlockEntity entity, float partialTick) {
-        BlockState state = entity.getBlockState();
-        if (state.getValue(FrostControllerBlock.ACTIVE)) {
-            Level level = entity.getLevel();
-            if (level != null) {
-                // 使用游戏时间 + partialTick 动态计算旋转角度
-                float angle = (level.getGameTime() + partialTick) * ROTATION_SPEED;
-                return angle;
-            }
-        }
-        return 0;
-    }
+
+
     protected float elevation() {
         return 0f;
     }
