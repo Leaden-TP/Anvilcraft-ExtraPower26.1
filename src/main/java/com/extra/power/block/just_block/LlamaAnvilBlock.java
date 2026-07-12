@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -159,5 +160,9 @@ public class LlamaAnvilBlock extends FallingBlock {
     @Override
     public int getDustColor(BlockState state, BlockGetter level, BlockPos pos) {
         return state.getMapColor(level, pos).col;
+    }
+    @Override
+    public PushReaction getPistonPushReaction(BlockState state) {
+        return PushReaction.NORMAL;
     }
 }
