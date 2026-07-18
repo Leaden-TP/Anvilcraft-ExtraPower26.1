@@ -104,6 +104,7 @@ public class ElectromagnetBlockEntity extends BlockEntity implements IPowerConsu
             BlockState state1 = level.getBlockState(currentPos);
 
             if (state1.is(BlockTags.ANVIL) && !state1.is(ModBlockTags.NON_MAGNETIC)) {
+                if (level.getBlockState(currentPos.below()).is(ModBlock.ELECTROMAGNET)){break ;}
                 level.destroyBlock(magnetPos.below(), true);
                 level.setBlockAndUpdate(magnetPos.below(), state1);
                 level.setBlockAndUpdate(currentPos, Blocks.AIR.defaultBlockState());

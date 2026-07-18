@@ -50,9 +50,7 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
     private static final int SYNC_INTERVAL = 40;
     private int action_t = 0;
     private int syncTimer = 0;
-    @Getter
     private int preRotation = 0;
-    @Getter
     private int rotation = 0;
     private boolean loading = false;
     private boolean locked = false;
@@ -260,10 +258,6 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
         output.putBoolean("locked", locked);
         itemHandler.serialize(output.child("Inventory"));
         output.putFloat("UserHeightOffset", userHeightOffset);
-        var animationComp = output.child("AnimationState");
-        for (int i = 0; i < action_state.size(); i++) {
-            animationComp.putDouble("ActionState_" + i, action_state.get(i));
-        }
     }
 
     @Override
@@ -273,12 +267,7 @@ public class MagneticDisplayStandBlockEntity extends BlockEntity
         locked = input.getBooleanOr("locked", false);
         itemHandler.deserialize(input.childOrEmpty("Inventory"));
         userHeightOffset = input.getFloatOr("UserHeightOffset", 0.0f);
-        userHeightOffset = (float) Math.clamp(userHeightOffset, MIN_HEIGHT_OFFSET, MAX_HEIGHT_OFFSET);
 
-        var animationComp = input.childOrEmpty("AnimationState");
-        for (int i = 0; i < action_state.size(); i++) {
-            action_state.set(i, animationComp.getDoubleOr("ActionState_" + i, 0.0));
-        }
         updateDisplayItemStack();
         // 服务端加载后确保立即同步物品，防止退出重进后物品丢失
         if (level != null && !level.isClientSide()) {
