@@ -20,7 +20,7 @@ public class UraniumRodBlockEntity extends BlockEntity {
     private static final int RADIUS = 15; // 效果半径
     private static final int DURATION = 200; // 效果持续时间(刻)
     private static final int AMPLIFIER = 1; // 效果等级
-    private static int tickCounter = 0;
+    private int tickCounter = 0;
     public UraniumRodBlockEntity(BlockPos pos, BlockState state) {
         super(URANIUM_ROD.get(), pos, state);
     }
@@ -30,7 +30,7 @@ public class UraniumRodBlockEntity extends BlockEntity {
         if (state.getValue(UraniumRodBlock.HALF)!=(Vertical3PartHalf.MID)||
                 state.getValue(UraniumRodBlock.ACTIVE)==0)return;
         entity.tickCounter++;
-        if (tickCounter>=20 ){
+        if (entity.tickCounter>=20 ){
             if(!state.getValue(UraniumRodBlock.UNDER_CONTROL) && !(state.getValue(UraniumRodBlock.ACTIVE)<5)
             && state.getValue(UraniumRodBlock.ACTIVE)>0){
             AABB area = new AABB(pos).inflate(RADIUS*state.getValue(UraniumRodBlock.ACTIVE));

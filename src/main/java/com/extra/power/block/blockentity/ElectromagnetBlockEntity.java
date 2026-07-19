@@ -34,7 +34,7 @@ import static com.extra.power.block.just_block.ElectromagnetBlock.LIT;
 public class ElectromagnetBlockEntity extends BlockEntity implements IPowerConsumer {
     private static final double ACCELERATION = 0.5;
     private static final int RANGE = AnvilCraft.CONFIG.magnetAttractsDistance*5;
-    private static int tickCounter = 0;
+    private int tickCounter = 0;
     private static final WeakHashMap<Level, HashSet<BlockPos>> LEVEL_ELECTROMAGNET_MAP = new WeakHashMap<>();
     @Getter
     private PowerGrid grid;
